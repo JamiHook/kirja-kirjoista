@@ -280,15 +280,20 @@ def get_books(
             params.append(domain)
 
         if q:
-            search_pattern = f"%{q}%"
-            query_str += """ AND (
-                b.title ILIKE %s OR 
-                b.author ILIKE %s OR 
-                b.publisher ILIKE %s OR 
-                b.isbn ILIKE %s OR 
-                b.processes ILIKE %s
-            )"""
-            params.extend([search_pattern] * 5)
+            # Split query into words to support multi-word search (e.g. "ken robinson")
+            search_terms = q.strip().split()
+            for term in search_terms:
+                if term:
+                    search_pattern = f"%{term}%"
+                    query_str += """ AND (
+                        b.title ILIKE %s OR 
+                        b.author ILIKE %s OR 
+                        b.publisher ILIKE %s OR 
+                        b.isbn ILIKE %s OR 
+                        b.processes ILIKE %s
+                    )"""
+                    params.extend([search_pattern] * 5)
+
 
         if sort == "author":
             query_str += " ORDER BY b.author ASC, b.title ASC"

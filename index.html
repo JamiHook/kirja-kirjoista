@@ -1749,14 +1749,26 @@
             grid.innerHTML = '';
 
             if (books.length === 0) {
+                let categoryNote = '';
+                if (selectedCategoryId !== null) {
+                    categoryNote = `
+                        <p style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" onclick="selectCategory(null)" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                Etsi kaikista kategorioista
+                            </button>
+                        </p>
+                    `;
+                }
                 grid.innerHTML = `
                     <div class="no-results">
                         <h3>Ei tuloksia</h3>
                         <p>Kokeile hakua eri hakuehdoilla tai toisella kategorialla.</p>
+                        ${categoryNote}
                     </div>
                 `;
                 return;
             }
+
 
             books.forEach(book => {
                 const card = document.createElement('div');
