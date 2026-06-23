@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirja kirjoista – Tiimiakatemia Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0c0c10;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-hover-bg: rgba(255, 255, 255, 0.06);
+            --glass-hover-border: rgba(255, 255, 255, 0.15);
+            --accent-primary: #9d4edd;
+            --accent-secondary: #4ea8de;
+            --accent-glow: rgba(157, 78, 221, 0.4);
+            --accent-glow-blue: rgba(78, 168, 222, 0.4);
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-main: 'Outfit', sans-serif;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Ambient background glow elements */
+        .ambient-glow-1 {
+            position: fixed;
+            top: -15%;
+            left: -10%;
+            width: 45vw;
+            height: 45vw;
+            background: radial-gradient(circle, rgba(157, 78, 221, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ambient-glow-2 {
+            position: fixed;
+            bottom: -15%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(78, 168, 222, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism utility */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+        }
+
+        /* Views (Auth and App) */
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+        }
+
+        /* Login Layout */
+        .auth-container {
+            max-width: 1100px;
+            margin: 5vh auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            min-height: 80vh;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+                margin: 2vh auto;
+                padding: 1rem;
+            }
+        }
+
+        /* Welcome intro card */
+        .welcome-info {
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+            justify-content: center;
+        }
+
+        .welcome-info h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-secondary) 50%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .welcome-info p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-point {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .feature-icon {
+            color: var(--accent-secondary);
+            font-size: 1.2rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        /* Login box */
+        .auth-box {
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .auth-box h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        /* Main layout container */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Header design */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .brand-section h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #dcd6f7 50%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand-section p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 400;
+            margin-top: 0.2rem;
+        }
+
+        /* User profile area */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .user-tag {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+        }
+
+        .user-role-badge {
+            font-weight: 700;
+            color: var(--accent-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            padding: 0.75rem 1.25rem;
+            text-align: center;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            min-width: 90px;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-color);
+            background: linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.1rem;
+        }
+
+        /* Main Workspace Grid (Sidebar + Books content) */
+        .workspace {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar: Domains & Categories */
+        .sidebar {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        /* Custom Scrollbar for Sidebar and main elements */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-color);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0.5rem;
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .domain-group {
+            margin-bottom: 1rem;
+        }
+
+        .domain-header {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--accent-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .domain-header:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .domain-header::after {
+            content: '▾';
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .domain-group.collapsed .domain-header::after {
+            transform: rotate(-90deg);
+        }
+
+        .domain-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            transition: max-height 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        .domain-group.collapsed .domain-categories {
+            max-height: 0 !important;
+        }
+
+        .category-item {
+            font-size: 0.85rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            text-align: left;
+            border: 1px solid transparent;
+            background: transparent;
+            width: 100%;
+        }
+
+        .category-item:hover {
+            background: var(--glass-hover-bg);
+            color: var(--text-color);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .category-item.active {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15) 0%, rgba(78, 168, 222, 0.1) 100%);
+            border: 1px solid var(--glass-hover-border);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.15);
+            font-weight: 500;
+        }
+
+        .category-code {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: var(--accent-secondary);
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .all-categories-btn {
+            width: 100%;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.02);
+            transition: var(--transition);
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .all-categories-btn:hover, .all-categories-btn.active {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border-color: transparent;
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Search & Controls Section */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .controls-panel {
+            padding: 1.25rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: var(--radius-md);
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-glow);
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            width: 16px;
+            height: 16px;
+        }
+
+        .control-buttons-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .sort-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sort-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .sort-select {
+            padding: 0.75rem 2rem 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.2em;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Buttons styling */
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #7b2cbf 100%);
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-secondary:hover {
+            background: var(--glass-hover-bg);
+            border-color: var(--glass-hover-border);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff5e62 0%, #ff2a2e 100%);
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(255, 94, 98, 0.2);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4);
+        }
+
+        /* Books Grid & Cards */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            min-height: 400px;
+        }
+
+        .book-card {
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--glass-hover-border);
+            background: var(--glass-hover-bg);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5), 0 0 20px rgba(157, 78, 221, 0.15);
+        }
+
+        .book-card:hover::before {
+            opacity: 1;
+            height: 6px;
+        }
+
+        .book-header {
+            margin-bottom: 1rem;
+        }
+
+        .book-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #fff;
+            margin-bottom: 0.4rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .book-author {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .book-category-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .book-details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .book-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stars-container {
+            color: #ffb703;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .points-badge {
+            background: rgba(78, 168, 222, 0.15);
+            border: 1px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .book-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .badge-pills {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .process-badge {
+            background: rgba(157, 78, 221, 0.15);
+            border: 1px solid var(--accent-primary);
+            color: #dcd6f7;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+
+        .insights-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: #ff5e62;
+            font-weight: 600;
+        }
+
+        .insights-badge svg {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+        }
+
+        /* Loader */
+        .loader-container {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 0;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--glass-border);
+            border-top: 4px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .no-results h3 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Modal overlay and content */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: var(--radius-lg);
+            position: relative;
+            transform: scale(0.9);
+            transition: var(--transition);
+            display: grid;
+            grid-template-columns: 1fr;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .modal-book-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .modal-book-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.25;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #dcd6f7 70%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-book-author {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .modal-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .modal-meta-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .modal-meta-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-meta-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Review / Comments area */
+        .comments-section h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comment-count-badge {
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 0.8rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            color: var(--accent-secondary);
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .comment-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            position: relative;
+        }
+
+        .comment-card.johannes {
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+        }
+
+        .comment-card.johannes::before {
+            content: 'Johanneksen arvio';
+            position: absolute;
+            top: -10px;
+            left: 1.25rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #7b2cbf 100%);
+            color: #fff;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(157, 78, 221, 0.3);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .comment-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .comment-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-color);
+            white-space: pre-line;
+        }
+
+        .comment-actions {
+            margin-top: 0.75rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Upvote Like button styling */
+        .like-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            color: var(--text-muted);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: var(--transition);
+        }
+
+        .like-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .like-btn.liked {
+            background: rgba(78, 168, 222, 0.15);
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            box-shadow: 0 0 10px rgba(78, 168, 222, 0.2);
+        }
+
+        /* Form styling */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.1em;
+            padding-right: 2rem;
+        }
+
+        .form-select option {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .form-info-disabled {
+            font-size: 0.75rem;
+            color: #ffb703;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        /* Star selector */
+        .star-rating-selector {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            font-size: 1.5rem;
+            margin: 0.25rem 0;
+        }
+
+        .star-rating-selector span {
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .star-rating-selector span.selected,
+        .star-rating-selector span:hover,
+        .star-rating-selector span:hover ~ span {
+            color: #ffb703;
+        }
+
+        /* Admin management tables */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .admin-table th, .admin-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .admin-table th {
+            color: var(--accent-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-table td {
+            font-size: 0.9rem;
+        }
+
+        /* Intro Text Style on Login screen */
+        .portal-intro-section {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .portal-intro-section h4 {
+            color: var(--accent-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .portal-intro-section ul {
+            padding-left: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <!-- 1. AUTHENTICATION VIEW -->
+    <section id="view-auth" class="view-section view-auth active">
+        <div class="auth-container">
+            <!-- Portal Saateteksti / Introduction -->
+            <div class="welcome-info">
+                <h2>Kirjojen Avartava Maailma</h2>
+                <p>
+                    Tervetuloa Tiimiakatemian <b>Kirja kirjoista</b> -portaaliin. Tämä järjestelmä muuntaa akatemian perustajan Johannes Partasen vuosikymmenten aikana rakentaman lukuperinnön ja pohjatyön digiaikaan.
+                </p>
+                <p>
+                    Kokonaisuus pohjautuu Johanneksen kehittämään <b>Rakettimalliin</b> ja sen sisältämiin <b>14 oppimisprosessiin</b>. Kirjoihin on liitetty Johanneksen alkuperäiset tiivistelmät, kolahdukset (oivallukset) sekä suositustähdet ja kirjapisteet.
+                </p>
+                
+                <div class="portal-intro-section">
+                    <h4>Portaalin Idea & Käyttö:</h4>
+                    <ul>
+                        <li><b>Selaa ja Etsi:</b> Löydä kirjoja teemoittain, alikategorioittain tai vapaalla hakusanalla.</li>
+                        <li><b>Lue Tiivistelmiä:</b> Katso Johanneksen arviot ja kolahdukset suoraan teosten alta.</li>
+                        <li><b>Osallistu:</b> Jaa omat kommenttisi, teoslinkityksesi ja oivalluksesi tiimioppimisen tueksi.</li>
+                        <li><b>Peukuta:</b> Anna palautetta ja peukuta muiden hyviä nostoja.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="auth-box glass-card" id="login-box">
+                <h3>Kirjaudu sisään</h3>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label class="form-label" for="login-username">Käyttäjätunnus</label>
+                        <input type="text" class="form-input" id="login-username" placeholder="esim. lukija" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label" for="login-password">Salasana</label>
+                        <input type="password" class="form-input" id="login-password" placeholder="Salasanasi" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.9rem;">
+                        Kirjaudu
+                    </button>
+                </form>
+                <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+                    Eikö sinulla ole tunnusta? 
+                    <a href="#" onclick="toggleAuthBox(false)" style="color: var(--accent-secondary); text-decoration: none; font-weight: 600;">Rekisteröidy tästä</a>
+                </p>
+                <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 1rem; padding-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+                    <b>Testitunnukset valmiina:</b><br>
+                    • <i>admin</i> / <i>admin123</i> (Ylläpitäjä)<br>
+                    • <i>johannes</i> / <i>johannes123</i> (Päätoimittaja)<br>
+                    • <i>valmentaja</i> / <i>valmentaja123</i> (Apueditori)<br>
+                    • <i>lukija</i> / <i>lukija123</i> (Lukija)
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div class="auth-box glass-card" id="register-box" style="display: none;">
+                <h3>Luo Lukijatunnus</h3>
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label class="form-label" for="reg-username">Käyttäjätunnus</label>
+                        <input type="text" class="form-input" id="reg-username" placeholder="Vähintään 3 merkkiä" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label class="form-label" for="reg-password">Salasana</label>
+                        <input type="password" class="form-input" id="reg-password" placeholder="Vähintään 6 merkkiä" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label" for="reg-password-confirm">Vahvista salasana</label>
+                        <input type="password" class="form-input" id="reg-password-confirm" placeholder="Kirjoita salasana uudelleen" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.9rem;">
+                        Rekisteröidy
+                    </button>
+                </form>
+                <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+                    Onko sinulla jo tunnus? 
+                    <a href="#" onclick="toggleAuthBox(true)" style="color: var(--accent-secondary); text-decoration: none; font-weight: 600;">Kirjaudu tästä</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. MAIN APPLICATION VIEW -->
+    <section id="view-app" class="view-section view-app">
+        <div class="app-container">
+            <!-- Header -->
+            <header class="glass-card">
+                <div class="brand-section">
+                    <h1>Kirja kirjoista</h1>
+                    <p>Johannes Partasen 14 oppimisprosessin Rocket-malliin pohjautuva kirjasto tekoälyajassa</p>
+                </div>
+                
+                <div class="user-profile">
+                    <div class="user-tag">
+                        Käyttäjä: <span id="user-display-name" style="font-weight:600; color:#fff;">-</span> 
+                        (<span class="user-role-badge" id="user-display-role">-</span>)
+                    </div>
+                    <div class="control-buttons-row">
+                        <button class="btn btn-secondary" onclick="handleLogout()">Uloskirjaus</button>
+                    </div>
+                </div>
+
+                <div class="stats-bar" id="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-books">-</div>
+                        <div class="stat-label">Kirjaa</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-categories">-</div>
+                        <div class="stat-label">Teemaa</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-reviews">-</div>
+                        <div class="stat-label">Kommenttia</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-insights">-</div>
+                        <div class="stat-label">Kolahdusta</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main workspace layout -->
+            <div class="workspace">
+                <!-- Sidebar with Category Tree -->
+                <aside class="sidebar glass-card">
+                    <h2>Teemat & Alueet</h2>
+                    <button class="all-categories-btn active" id="btn-all-categories" onclick="selectCategory(null)">
+                        Kaikki kirjat
+                    </button>
+                    <div class="category-list" id="category-tree">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </aside>
+
+                <!-- Main search results area -->
+                <main class="main-content">
+                    <div class="controls-panel glass-card">
+                        <div class="search-wrapper">
+                            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input type="text" class="search-input" id="search-input" placeholder="Etsi kirjaa, kirjailijaa, ISBN:ää tai prosessia..." oninput="handleSearch()">
+                        </div>
+                        
+                        <div class="sort-wrapper">
+                            <span class="sort-label">Järjestys:</span>
+                            <select class="sort-select" id="sort-select" onchange="handleSort()">
+                                <option value="title">Aakkosjärjestys (Nimi)</option>
+                                <option value="author">Kirjailija (A-Z)</option>
+                                <option value="stars">Johanneksen Tähdet</option>
+                                <option value="points">Kirjapisteet</option>
+                                <option value="kolahdukset">Kolahdukset</option>
+                            </select>
+                        </div>
+
+                        <div class="control-buttons-row">
+                            <button class="btn btn-primary" id="btn-add-book" style="display:none;" onclick="openAddBookModal()">
+                                <span>+</span> Lisää kirja
+                            </button>
+                            <button class="btn btn-secondary" id="btn-user-mgmt" style="display:none;" onclick="openUserMgmtModal()">
+                                Käyttäjät
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Books Grid -->
+                    <div class="books-grid" id="books-grid">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="book-modal" onclick="closeModal(event, 'book-modal')">
+        <div class="modal-card glass-card" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="toggleModal('book-modal', false)">&times;</button>
+            <div class="modal-body" id="modal-content">
+                <!-- Loaded dynamically on demand -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Book Modal -->
+    <div class="modal-overlay" id="add-book-modal" onclick="closeModal(event, 'add-book-modal')">
+        <div class="modal-card glass-card" onclick="event.stopPropagation()" style="max-width: 700px;">
+            <button class="close-btn" onclick="toggleModal('add-book-modal', false)">&times;</button>
+            <div class="modal-body">
+                <h3 id="add-book-modal-title" style="font-size: 1.5rem; font-weight:700; color:#fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom:1rem; margin-bottom:1.5rem;">Lisää uusi kirja</h3>
+                <form id="book-form" onsubmit="handleBookSubmit(event)">
+                    <input type="hidden" id="form-book-id">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="form-title">Kirjan nimi *</label>
+                            <input type="text" class="form-input" id="form-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="form-author">Kirjailija *</label>
+                            <input type="text" class="form-input" id="form-author" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="form-category">Kategoria / Teema *</label>
+                            <select class="form-select" id="form-category" required>
+                                <!-- Categories populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="form-publisher">Kustantaja</label>
+                            <input type="text" class="form-input" id="form-publisher">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="form-year">Vuosi</label>
+                            <input type="number" class="form-input" id="form-year">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="form-isbn">ISBN</label>
+                            <input type="text" class="form-input" id="form-isbn">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="form-language">Kieli</label>
+                            <input type="text" class="form-input" id="form-language" value="suom.">
+                        </div>
+                        <!-- Stars Rating (HeadEditor / Admin only) -->
+                        <div class="form-group val-fields">
+                            <label class="form-label" for="form-stars">Johanneksen arvosana (Tähdet 0-3)</label>
+                            <input type="number" class="form-input" id="form-stars" min="0" max="3" value="1">
+                        </div>
+                    </div>
+
+                    <div class="form-grid val-fields">
+                        <div class="form-group">
+                            <label class="form-label" for="form-points">Kirjapisteet</label>
+                            <input type="number" class="form-input" id="form-points" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="form-processes">Rocket-prosessit (esim. Y1+Y2)</label>
+                            <input type="text" class="form-input" id="form-processes" placeholder="esim. Y1+A2">
+                        </div>
+                    </div>
+
+                    <div class="form-group val-fields" style="margin-bottom: 1.5rem;">
+                        <label class="form-label" for="form-kolahdukset">Kolahdusten määrä</label>
+                        <input type="number" class="form-input" id="form-kolahdukset" min="0" value="0">
+                    </div>
+
+                    <div class="form-info-disabled" id="coeditor-info" style="display:none; margin-bottom: 1rem;">
+                        Huom: CoEditor-roolilla et voi muokata Johanneksen arvosanoja, pisteitä tai kolahduksia. Nämä kentät on lukittu.
+                    </div>
+
+                    <div style="display:flex; justify-content: flex-end; gap: 1rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem;">
+                        <button type="button" class="btn btn-secondary" onclick="toggleModal('add-book-modal', false)">Peruuta</button>
+                        <button type="submit" class="btn btn-primary" id="btn-book-form-submit">Tallenna kirja</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Modal (Admin only) -->
+    <div class="modal-overlay" id="user-mgmt-modal" onclick="closeModal(event, 'user-mgmt-modal')">
+        <div class="modal-card glass-card" onclick="event.stopPropagation()" style="max-width: 750px;">
+            <button class="close-btn" onclick="toggleModal('user-mgmt-modal', false)">&times;</button>
+            <div class="modal-body">
+                <h3 style="font-size: 1.5rem; font-weight:700; color:#fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom:1rem; margin-bottom:1.5rem;">Käyttöoikeuksien hallinta</h3>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Käyttäjätunnus</th>
+                                <th>Nykyinen rooli</th>
+                                <th>Muuta roolia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-mgmt-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display:flex; justify-content: flex-end; margin-top:1.5rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem;">
+                    <button class="btn btn-secondary" onclick="toggleModal('user-mgmt-modal', false)">Sulje</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State variables
+        let categories = [];
+        let books = [];
+        let selectedCategoryId = null;
+        let currentSearchQuery = '';
+        let currentSort = 'title';
+        let activeRating = 5;
+
+        // User Auth State
+        let currentUser = null;
+
+        // On document load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+
+        // Auth Logic
+        function checkAuth() {
+            const token = localStorage.getItem("token");
+            const username = localStorage.getItem("username");
+            const role = localStorage.getItem("role");
+
+            if (token && username && role) {
+                currentUser = { token, username, role };
+                showAppView();
+            } else {
+                showAuthView();
+            }
+        }
+
+        function showAuthView() {
+            document.getElementById('view-auth').classList.add('active');
+            document.getElementById('view-app').classList.remove('active');
+            currentUser = null;
+        }
+
+        function showAppView() {
+            document.getElementById('view-auth').classList.remove('active');
+            document.getElementById('view-app').classList.add('active');
+
+            // Set user profile text
+            document.getElementById('user-display-name').innerText = currentUser.username;
+            document.getElementById('user-display-role').innerText = currentUser.role;
+
+            // Show/Hide role based buttons
+            const role = currentUser.role;
+            if (role === 'Admin' || role === 'HeadEditor' || role === 'CoEditor') {
+                document.getElementById('btn-add-book').style.display = 'flex';
+            } else {
+                document.getElementById('btn-add-book').style.display = 'none';
+            }
+
+            if (role === 'Admin') {
+                document.getElementById('btn-user-mgmt').style.display = 'flex';
+            } else {
+                document.getElementById('btn-user-mgmt').style.display = 'none';
+            }
+
+            // Fetch main data
+            fetchStats();
+            fetchCategories();
+            fetchBooks();
+        }
+
+        function toggleAuthBox(showLogin) {
+            if (showLogin) {
+                document.getElementById('login-box').style.display = 'block';
+                document.getElementById('register-box').style.display = 'none';
+            } else {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('register-box').style.display = 'block';
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('login-username').value;
+            const passwordInput = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("username", data.username);
+                    localStorage.setItem("role", data.role);
+                    
+                    // Clear inputs
+                    document.getElementById('login-username').value = '';
+                    document.getElementById('login-password').value = '';
+
+                    checkAuth();
+                } else {
+                    const err = await response.json();
+                    alert(`Kirjautuminen epäonnistui: ${err.detail || 'Tarkista tunnus ja salasana'}`);
+                }
+            } catch (err) {
+                console.error("Login error:", err);
+                alert("Yhteysvirhe palvelimeen.");
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('reg-username').value;
+            const passwordInput = document.getElementById('reg-password').value;
+            const confirmInput = document.getElementById('reg-password-confirm').value;
+
+            if (passwordInput !== confirmInput) {
+                alert("Salasanat eivät täsmää!");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                });
+
+                if (response.ok) {
+                    alert("Rekisteröinti onnistui! Voit nyt kirjautua sisään.");
+                    // Clear inputs
+                    document.getElementById('reg-username').value = '';
+                    document.getElementById('reg-password').value = '';
+                    document.getElementById('reg-password-confirm').value = '';
+                    toggleAuthBox(true);
+                } else {
+                    const err = await response.json();
+                    alert(`Rekisteröinti epäonnistui: ${err.detail}`);
+                }
+            } catch (err) {
+                console.error("Register error:", err);
+                alert("Yhteysvirhe palvelimeen.");
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            localStorage.removeItem("role");
+            showAuthView();
+        }
+
+        // Fetch overview stats
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('stat-books').innerText = stats.total_books;
+                    document.getElementById('stat-categories').innerText = stats.total_categories;
+                    document.getElementById('stat-reviews').innerText = stats.total_reviews;
+                    document.getElementById('stat-insights').innerText = stats.total_insights;
+                }
+            } catch (err) {
+                console.error("Error loading stats:", err);
+            }
+        }
+
+        // Fetch categories and render sidebar tree
+        async function fetchCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                if (response.ok) {
+                    categories = await response.json();
+                    renderCategoryTree();
+                    populateCategoryFormDropdown();
+                }
+            } catch (err) {
+                console.error("Error fetching categories:", err);
+            }
+        }
+
+        function populateCategoryFormDropdown() {
+            const select = document.getElementById('form-category');
+            select.innerHTML = '<option value="" disabled selected>Valitse kategoria...</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.text = `${cat.code} - ${cat.name}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Render the tree groupings of domains and categories in sidebar
+        function renderCategoryTree() {
+            const container = document.getElementById('category-tree');
+            container.innerHTML = '';
+
+            const domainsMap = {};
+            categories.forEach(cat => {
+                const domainKey = cat.domain;
+                if (!domainsMap[domainKey]) {
+                    domainsMap[domainKey] = {
+                        code: cat.domain_code,
+                        categories: []
+                    };
+                }
+                domainsMap[domainKey].categories.push(cat);
+            });
+
+            Object.keys(domainsMap).forEach(domainName => {
+                const domainData = domainsMap[domainName];
+                
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'domain-group';
+                groupDiv.id = `domain-group-${domainData.code}`;
+
+                const header = document.createElement('div');
+                header.className = 'domain-header';
+                header.innerHTML = `<span>${domainData.code}: ${domainName}</span>`;
+                header.onclick = () => toggleDomainCollapse(groupDiv.id);
+
+                const categoriesContainer = document.createElement('div');
+                categoriesContainer.className = 'domain-categories';
+
+                domainData.categories.forEach(cat => {
+                    const catBtn = document.createElement('button');
+                    catBtn.className = 'category-item';
+                    catBtn.id = `cat-btn-${cat.id}`;
+                    catBtn.onclick = () => selectCategory(cat.id);
+                    catBtn.innerHTML = `
+                        <span class="category-code">${cat.code}</span>
+                        <span>${cat.name}</span>
+                    `;
+                    categoriesContainer.appendChild(catBtn);
+                });
+
+                groupDiv.appendChild(header);
+                groupDiv.appendChild(categoriesContainer);
+                container.appendChild(groupDiv);
+                
+                categoriesContainer.style.maxHeight = `${categoriesContainer.scrollHeight}px`;
+            });
+        }
+
+        function toggleDomainCollapse(groupId) {
+            const group = document.getElementById(groupId);
+            const container = group.querySelector('.domain-categories');
+            
+            if (group.classList.contains('collapsed')) {
+                group.classList.remove('collapsed');
+                container.style.maxHeight = `${container.scrollHeight}px`;
+            } else {
+                group.classList.add('collapsed');
+                container.style.maxHeight = '0px';
+            }
+        }
+
+        // Fetch books from API applying search & filter states
+        async function fetchBooks() {
+            const grid = document.getElementById('books-grid');
+            grid.innerHTML = `
+                <div class="loader-container">
+                    <div class="spinner"></div>
+                    <p>Haetaan kirjoja tietokannasta...</p>
+                </div>
+            `;
+
+            try {
+                let url = `/api/books?sort=${currentSort}`;
+                if (selectedCategoryId) {
+                    url += `&category_id=${selectedCategoryId}`;
+                }
+                if (currentSearchQuery) {
+                    url += `&q=${encodeURIComponent(currentSearchQuery)}`;
+                }
+
+                const response = await fetch(url);
+                if (response.ok) {
+                    books = await response.json();
+                    renderBooksGrid();
+                } else {
+                    grid.innerHTML = `
+                        <div class="no-results">
+                            <h3>Yhteysvirhe tietokantaan</h3>
+                            <p>Tietojen lataaminen epäonnistui.</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error("Error fetching books:", err);
+                grid.innerHTML = `
+                    <div class="no-results">
+                        <h3>Tapahtui virhe</h3>
+                        <p>${err.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render cards grid
+        function renderBooksGrid() {
+            const grid = document.getElementById('books-grid');
+            grid.innerHTML = '';
+
+            if (books.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-results">
+                        <h3>Ei tuloksia</h3>
+                        <p>Kokeile hakua eri hakuehdoilla tai toisella kategorialla.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            books.forEach(book => {
+                const card = document.createElement('div');
+                card.className = 'book-card glass-card';
+                card.onclick = () => openBookDetails(book.id);
+
+                let starsHTML = '';
+                for (let i = 0; i < 3; i++) {
+                    starsHTML += (i < book.stars) ? '★' : '☆';
+                }
+
+                let processesHTML = '';
+                if (book.processes) {
+                    const codes = book.processes.split('+');
+                    codes.forEach(code => {
+                        if (code.trim()) {
+                            processesHTML += `<span class="process-badge">${code.trim()}</span>`;
+                        }
+                    });
+                }
+
+                const publisherText = [book.publisher, book.year].filter(Boolean).join(', ');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="book-header">
+                            <h3 class="book-title" title="${book.title}">${book.title}</h3>
+                            <div class="book-author">${book.author}</div>
+                            <span class="book-category-badge">${book.category_code} – ${book.category_name}</span>
+                        </div>
+                        <div class="book-details">
+                            <div class="book-meta-row">
+                                <span class="stars-container" title="Johanneksen arvosana: ${book.stars} tähteä">${starsHTML}</span>
+                                ${book.points ? `<span class="points-badge">${book.points} p.</span>` : ''}
+                            </div>
+                            ${publisherText ? `<div style="font-size: 0.8rem; margin-top: 0.4rem;">${publisherText}</div>` : ''}
+                            ${book.isbn ? `<div style="font-size: 0.75rem; font-family: monospace;">ISBN: ${book.isbn}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="book-footer">
+                        <div class="badge-pills">
+                            ${processesHTML}
+                        </div>
+                        ${book.kolahdukset ? `
+                            <div class="insights-badge" title="Tiedostosta poimitut kolahdukset">
+                                <svg viewBox="0 0 24 24"><path d="M17.66 11.57c-.77-2.6-2.21-4.96-4.38-6.71l-1.28-1.03-1.28 1.03c-2.17 1.75-3.61 4.11-4.38 6.71-.46 1.54-.53 3.12-.22 4.67.14.7.4 1.37.77 1.99.74 1.25 1.99 2.19 3.45 2.58.55.15 1.11.23 1.66.23s1.11-.08 1.66-.23c1.46-.39 2.71-1.33 3.45-2.58.37-.62.63-1.29.77-1.99.31-1.55.24-3.13-.22-4.67zM12 19c-2.21 0-4-1.79-4-4 0-.85.34-1.63.9-2.2l.06-.06c.64-.64.84-1.59.51-2.45-.16-.41-.28-.86-.35-1.32.74 1.09 1.9 1.96 3.23 2.48 1 .39 1.65 1.34 1.65 2.41 0 2.21-1.79 4-4 4z"/></svg>
+                                <span>${book.kolahdukset} kol.</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function selectCategory(catId) {
+            selectedCategoryId = catId;
+            
+            document.querySelectorAll('.category-item').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const btnAll = document.getElementById('btn-all-categories');
+            
+            if (catId === null) {
+                btnAll.classList.add('active');
+            } else {
+                btnAll.classList.remove('active');
+                const activeBtn = document.getElementById(`cat-btn-${catId}`);
+                if (activeBtn) {
+                    activeBtn.classList.add('active');
+                }
+            }
+            
+            fetchBooks();
+        }
+
+        let searchTimeout;
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentSearchQuery = document.getElementById('search-input').value;
+                fetchBooks();
+            }, 300);
+        }
+
+        function handleSort() {
+            currentSort = document.getElementById('sort-select').value;
+            fetchBooks();
+        }
+
+        // Modal helpers
+        function toggleModal(modalId, show) {
+            const modal = document.getElementById(modalId);
+            if (show) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeModal(event, modalId) {
+            if (event.target.id === modalId) {
+                toggleModal(modalId, false);
+            }
+        }
+
+        // Load details for single book
+        async function openBookDetails(bookId) {
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="loader-container">
+                    <div class="spinner"></div>
+                    <p>Ladataan kirjan lisätietoja...</p>
+                </div>
+            `;
+            
+            toggleModal('book-modal', true);
+
+            try {
+                const headers = { 'Authorization': `Bearer ${currentUser.token}` };
+                const response = await fetch(`/api/books/${bookId}`, { headers });
+                
+                if (response.ok) {
+                    const book = await response.json();
+                    renderBookDetails(book);
+                } else {
+                    modalContent.innerHTML = `<h3>Virhe ladattaessa tietoja</h3><p>Tietojen lataaminen epäonnistui.</p>`;
+                }
+            } catch (err) {
+                modalContent.innerHTML = `<h3>Tapahtui virhe</h3><p>${err.message}</p>`;
+            }
+        }
+
+        // Render details + reviews + like/upvote logic into modal
+        function renderBookDetails(book) {
+            const modalContent = document.getElementById('modal-content');
+
+            let starsHTML = '';
+            for (let i = 0; i < 3; i++) {
+                starsHTML += (i < book.stars) ? '★' : '☆';
+            }
+
+            // Book modification permissions check
+            const role = currentUser.role;
+            const canModify = (role === 'Admin' || role === 'HeadEditor' || role === 'CoEditor');
+            const canDelete = (role === 'Admin' || role === 'HeadEditor');
+
+            let actionButtonsHTML = '';
+            if (canModify) {
+                actionButtonsHTML += `
+                    <button class="btn btn-secondary" onclick="openEditBookModal(${book.id})">Muokkaa</button>
+                `;
+            }
+            if (canDelete) {
+                actionButtonsHTML += `
+                    <button class="btn btn-danger" onclick="handleBookDelete(${book.id})">Poista</button>
+                `;
+            }
+
+            // Reviews list
+            let reviewsHTML = '';
+            if (book.reviews && book.reviews.length > 0) {
+                book.reviews.forEach(rev => {
+                    const isJohannes = (rev.reviewer_name === 'Johannes Partanen' || rev.reviewer_name === 'johannes');
+                    const reviewStars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+                    const dateStr = rev.created_at ? new Date(rev.created_at).toLocaleDateString('fi-FI') : '';
+
+                    const isLiked = rev.user_liked;
+
+                    reviewsHTML += `
+                        <div class="comment-card ${isJohannes ? 'johannes' : ''}">
+                            <div class="comment-header">
+                                <span class="comment-author">${rev.reviewer_name}</span>
+                                <div>
+                                    <span class="stars-container" style="display:inline; margin-right: 10px;">${reviewStars}</span>
+                                    <span class="comment-date">${dateStr}</span>
+                                </div>
+                            </div>
+                            <div class="comment-text">${rev.review_text}</div>
+                            
+                            <div class="comment-actions">
+                                <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLikeReview(event, ${rev.id}, ${isLiked}, ${book.id})">
+                                    <span>👍</span> <span class="like-count">${rev.likes_count}</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                reviewsHTML = `<p style="color: var(--text-muted); font-style: italic;">Ei arvosteluja tai kommentteja vielä.</p>`;
+            }
+
+            // Render modal layout
+            modalContent.innerHTML = `
+                <div class="modal-book-header">
+                    <div>
+                        <h2 class="modal-book-title">${book.title}</h2>
+                        <div class="modal-book-author">${book.author}</div>
+                        <span class="book-category-badge">${book.category_code} – ${book.category_name}</span>
+                    </div>
+                    <div class="control-buttons-row">
+                        ${actionButtonsHTML}
+                    </div>
+                </div>
+
+                <div class="modal-meta-grid">
+                    <div class="modal-meta-card">
+                        <div class="modal-meta-label">Johanneksen arvio</div>
+                        <div class="modal-meta-value stars-container" style="justify-content: center; font-size: 1.1rem;">${starsHTML}</div>
+                    </div>
+                    ${book.points ? `
+                    <div class="modal-meta-card">
+                        <div class="modal-meta-label">Kirjapisteet</div>
+                        <div class="modal-meta-value">${book.points} p.</div>
+                    </div>
+                    ` : ''}
+                    ${book.kolahdukset ? `
+                    <div class="modal-meta-card" style="color: #ff5e62;">
+                        <div class="modal-meta-label" style="color: #ff5e62;">Kolahdukset</div>
+                        <div class="modal-meta-value">🔥 ${book.kolahdukset} kpl</div>
+                    </div>
+                    ` : ''}
+                    ${book.processes ? `
+                    <div class="modal-meta-card">
+                        <div class="modal-meta-label">Prosessit</div>
+                        <div class="modal-meta-value" style="color: var(--accent-secondary);">${book.processes}</div>
+                    </div>
+                    ` : ''}
+                    ${book.publisher ? `
+                    <div class="modal-meta-card">
+                        <div class="modal-meta-label">Kustantaja</div>
+                        <div class="modal-meta-value">${book.publisher}</div>
+                    </div>
+                    ` : ''}
+                    ${book.year ? `
+                    <div class="modal-meta-card">
+                        <div class="modal-meta-label">Vuosi</div>
+                        <div class="modal-meta-value">${book.year}</div>
+                    </div>
+                    ` : ''}
+                    ${book.isbn ? `
+                    <div class="modal-meta-card">
+                        <div class="modal-meta-label">ISBN</div>
+                        <div class="modal-meta-value" style="font-size: 0.8rem; font-family: monospace;">${book.isbn}</div>
+                    </div>
+                    ` : ''}
+                    ${book.page_number ? `
+                    <div class="modal-meta-card">
+                        <div class="modal-meta-label">Sivu teoksessa</div>
+                        <div class="modal-meta-value">s. ${book.page_number}</div>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="comments-section">
+                    <h3>Kommentit ja nostot <span class="comment-count-badge" id="modal-comment-count">${book.reviews ? book.reviews.length : 0}</span></h3>
+                    <div class="comments-list" id="modal-comments-list">
+                        ${reviewsHTML}
+                    </div>
+                </div>
+
+                <!-- Add Comment Form -->
+                <div class="add-comment-form">
+                    <h4>Lisää oma kommentti tai kirjanosto</h4>
+                    <form id="comment-form" onsubmit="submitReview(event, ${book.id})">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Arvio / Merkitys (tähdet)</label>
+                                <div class="star-rating-selector" id="star-rating-selector">
+                                    <span onclick="setRating(1)">★</span>
+                                    <span onclick="setRating(2)">★</span>
+                                    <span onclick="setRating(3)">★</span>
+                                    <span onclick="setRating(4)">★</span>
+                                    <span onclick="setRating(5)">★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="review-text">Kommentti tai kirjanosto</label>
+                            <textarea class="form-textarea" id="review-text" rows="4" placeholder="Kirjoita vapaamuotoinen kommenttisi, huomiosi tai teoksen merkitys oppimisprosessin kannalta..." required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            Tallenna kommentti
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            activeRating = 5;
+            setRating(5);
+        }
+
+        function setRating(rating) {
+            activeRating = rating;
+            const stars = document.querySelectorAll('#star-rating-selector span');
+            stars.forEach((star, idx) => {
+                if (idx < rating) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+        }
+
+        // Toggle review upvote (Like)
+        async function toggleLikeReview(event, reviewId, currentlyLiked, bookId) {
+            event.stopPropagation();
+            const method = currentlyLiked ? 'DELETE' : 'POST';
+            
+            try {
+                const headers = { 'Authorization': `Bearer ${currentUser.token}` };
+                const response = await fetch(`/api/reviews/${reviewId}/like`, { method, headers });
+
+                if (response.ok) {
+                    // Refresh book details to update counts
+                    const responseDetails = await fetch(`/api/books/${bookId}`, { headers });
+                    if (responseDetails.ok) {
+                        const book = await responseDetails.json();
+                        renderBookDetails(book);
+                    }
+                } else {
+                    const err = await response.json();
+                    alert(`Toiminto epäonnistui: ${err.detail}`);
+                }
+            } catch (err) {
+                console.error("Like error:", err);
+            }
+        }
+
+        // Submit comment
+        async function submitReview(event, bookId) {
+            event.preventDefault();
+            const reviewText = document.getElementById('review-text').value.trim();
+            
+            if (!reviewText) return;
+
+            const payload = {
+                rating: activeRating,
+                review_text: reviewText
+            };
+
+            const submitBtn = event.target.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Tallennetaan...';
+
+            try {
+                const response = await fetch(`/api/books/${bookId}/reviews`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentUser.token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    // Refresh stats and book details
+                    fetchStats();
+                    const headers = { 'Authorization': `Bearer ${currentUser.token}` };
+                    const responseDetails = await fetch(`/api/books/${bookId}`, { headers });
+                    if (responseDetails.ok) {
+                        const book = await responseDetails.json();
+                        renderBookDetails(book);
+                    }
+                } else {
+                    const err = await response.json();
+                    alert(`Virhe: ${err.detail || 'Tallennus epäonnistui'}`);
+                }
+            } catch (err) {
+                console.error("Error submitting review:", err);
+                alert(`Virhe: ${err.message}`);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Tallenna kommentti';
+            }
+        }
+
+        // Book Create / Edit Modal logic
+        function openAddBookModal() {
+            document.getElementById('add-book-modal-title').innerText = "Lisää uusi kirja";
+            document.getElementById('form-book-id').value = "";
+            document.getElementById('book-form').reset();
+            
+            configureBookFormFields();
+            toggleModal('add-book-modal', true);
+        }
+
+        async function openEditBookModal(bookId) {
+            document.getElementById('add-book-modal-title').innerText = "Muokkaa kirjaa";
+            document.getElementById('form-book-id').value = bookId;
+            
+            toggleModal('book-modal', false); // Hide detail modal
+
+            try {
+                const headers = { 'Authorization': `Bearer ${currentUser.token}` };
+                const response = await fetch(`/api/books/${bookId}`, { headers });
+                
+                if (response.ok) {
+                    const book = await response.json();
+                    
+                    document.getElementById('form-title').value = book.title;
+                    document.getElementById('form-author').value = book.author;
+                    document.getElementById('form-category').value = book.category_id;
+                    document.getElementById('form-publisher').value = book.publisher || "";
+                    document.getElementById('form-year').value = book.year || "";
+                    document.getElementById('form-isbn').value = book.isbn || "";
+                    document.getElementById('form-language').value = book.language || "suom.";
+                    document.getElementById('form-stars').value = book.stars || 1;
+                    document.getElementById('form-points').value = book.points || 0;
+                    document.getElementById('form-processes').value = book.processes || "";
+                    document.getElementById('form-kolahdukset').value = book.kolahdukset || 0;
+
+                    configureBookFormFields();
+                    toggleModal('add-book-modal', true);
+                } else {
+                    alert("Kirjan tietojen haku epäonnistui.");
+                }
+            } catch (err) {
+                console.error("Edit book load error:", err);
+            }
+        }
+
+        function configureBookFormFields() {
+            const role = currentUser.role;
+            const isCoEditor = (role === 'CoEditor');
+            
+            // If CoEditor, lock and grey out the assessment rating fields
+            const valFields = document.querySelectorAll('.val-fields');
+            const inputs = [
+                document.getElementById('form-stars'),
+                document.getElementById('form-points'),
+                document.getElementById('form-processes'),
+                document.getElementById('form-kolahdukset')
+            ];
+
+            if (isCoEditor) {
+                valFields.forEach(f => f.style.opacity = '0.5');
+                inputs.forEach(i => {
+                    i.disabled = true;
+                    i.required = false;
+                });
+                document.getElementById('coeditor-info').style.display = 'block';
+            } else {
+                valFields.forEach(f => f.style.opacity = '1');
+                inputs.forEach(i => {
+                    i.disabled = false;
+                });
+                document.getElementById('coeditor-info').style.display = 'none';
+            }
+        }
+
+        async function handleBookSubmit(event) {
+            event.preventDefault();
+            const bookId = document.getElementById('form-book-id').value;
+            
+            const payload = {
+                category_id: parseInt(document.getElementById('form-category').value),
+                author: document.getElementById('form-author').value.trim(),
+                title: document.getElementById('form-title').value.trim(),
+                publisher: document.getElementById('form-publisher').value.trim() || null,
+                year: parseInt(document.getElementById('form-year').value) || null,
+                isbn: document.getElementById('form-isbn').value.trim() || null,
+                language: document.getElementById('form-language').value.trim() || "suom.",
+                stars: parseInt(document.getElementById('form-stars').value) || 0,
+                points: parseInt(document.getElementById('form-points').value) || 0,
+                processes: document.getElementById('form-processes').value.trim() || "",
+                kolahdukset: parseInt(document.getElementById('form-kolahdukset').value) || 0
+            };
+
+            const method = bookId ? 'PUT' : 'POST';
+            const url = bookId ? `/api/books/${bookId}` : '/api/books';
+
+            const submitBtn = document.getElementById('btn-book-form-submit');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Tallennetaan...';
+
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentUser.token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    toggleModal('add-book-modal', false);
+                    fetchStats();
+                    fetchBooks();
+                    
+                    if (bookId) {
+                        // Re-open modified book details
+                        setTimeout(() => openBookDetails(bookId), 200);
+                    }
+                } else {
+                    const err = await response.json();
+                    alert(`Virhe: ${err.detail}`);
+                }
+            } catch (err) {
+                console.error("Book submit error:", err);
+                alert("Yhteysvirhe tallennettaessa kirjaa.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Tallenna kirja';
+            }
+        }
+
+        async function handleBookDelete(bookId) {
+            if (!confirm("Haluatko varmasti poistaa tämän kirjan kokonaan kirjastosta ja tietokannasta? Toimintoa ei voi peruuttaa.")) {
+                return;
+            }
+
+            try {
+                const headers = { 'Authorization': `Bearer ${currentUser.token}` };
+                const response = await fetch(`/api/books/${bookId}`, {
+                    method: 'DELETE',
+                    headers
+                });
+
+                if (response.ok) {
+                    toggleModal('book-modal', false);
+                    fetchStats();
+                    fetchBooks();
+                    alert("Kirja poistettu onnistuneesti.");
+                } else {
+                    const err = await response.json();
+                    alert(`Poisto epäonnistui: ${err.detail}`);
+                }
+            } catch (err) {
+                console.error("Delete book error:", err);
+            }
+        }
+
+        // Admin User Management logic
+        async function openUserMgmtModal() {
+            const tableBody = document.getElementById('user-mgmt-table-body');
+            tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Ladataan käyttäjiä...</td></tr>';
+            
+            toggleModal('user-mgmt-modal', true);
+
+            try {
+                const headers = { 'Authorization': `Bearer ${currentUser.token}` };
+                const response = await fetch('/api/admin/users', { headers });
+
+                if (response.ok) {
+                    const users = await response.json();
+                    renderUserManagementList(users);
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#ff5e62;">Virhe ladattaessa käyttäjiä.</td></tr>';
+                }
+            } catch (err) {
+                console.error("Load users error:", err);
+            }
+        }
+
+        function renderUserManagementList(users) {
+            const tableBody = document.getElementById('user-mgmt-table-body');
+            tableBody.innerHTML = '';
+
+            const roles = ["Admin", "HeadEditor", "CoEditor", "Reader"];
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                
+                // Prevent self role modification directly to avoid locking out the admin
+                const isSelf = (user.username === currentUser.username);
+                let selectHTML = '';
+                
+                if (isSelf) {
+                    selectHTML = `<span style="font-style:italic; color:var(--text-muted);">Itse (Lukittu)</span>`;
+                } else {
+                    selectHTML = `<select class="form-select" style="padding:0.4rem; font-size:0.85rem;" onchange="handleUserRoleChange(${user.id}, this.value)">`;
+                    roles.forEach(role => {
+                        const selected = (user.role === role) ? 'selected' : '';
+                        selectHTML += `<option value="${role}" ${selected}>${role}</option>`;
+                    });
+                    selectHTML += `</select>`;
+                }
+
+                tr.innerHTML = `
+                    <td style="font-weight:600; color:#fff;">${user.username}</td>
+                    <td><span class="user-role-badge">${user.role}</span></td>
+                    <td>${selectHTML}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        async function handleUserRoleChange(userId, newRole) {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentUser.token}`
+                };
+                const response = await fetch(`/api/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                if (response.ok) {
+                    alert("Rooli päivitetty onnistuneesti.");
+                    // Reload list
+                    const responseUsers = await fetch('/api/admin/users', { headers });
+                    if (responseUsers.ok) {
+                        const users = await responseUsers.json();
+                        renderUserManagementList(users);
+                    }
+                } else {
+                    const err = await response.json();
+                    alert(`Päivitys epäonnistui: ${err.detail}`);
+                }
+            } catch (err) {
+                console.error("Role update error:", err);
+            }
+        }
+    </script>
+</body>
+</html>
