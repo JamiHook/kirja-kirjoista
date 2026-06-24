@@ -1851,9 +1851,23 @@
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 currentSearchQuery = document.getElementById('search-input').value;
+                
+                // Reset category filter to search globally when query is typed
+                if (currentSearchQuery.trim() !== '') {
+                    selectedCategoryId = null;
+                    document.querySelectorAll('.category-item').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    const btnAll = document.getElementById('btn-all-categories');
+                    if (btnAll) {
+                        btnAll.classList.add('active');
+                    }
+                }
+                
                 fetchBooks();
             }, 300);
         }
+
 
         function handleSort() {
             currentSort = document.getElementById('sort-select').value;
