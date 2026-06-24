@@ -290,9 +290,14 @@ def get_books(
                         b.author ILIKE %s OR 
                         b.publisher ILIKE %s OR 
                         b.isbn ILIKE %s OR 
-                        b.processes ILIKE %s
+                        b.processes ILIKE %s OR
+                        EXISTS (
+                            SELECT 1 FROM reviews r 
+                            WHERE r.book_id = b.id AND r.review_text ILIKE %s
+                        )
                     )"""
-                    params.extend([search_pattern] * 5)
+                    params.extend([search_pattern] * 6)
+
 
 
         if sort == "author":
