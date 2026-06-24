@@ -284,19 +284,40 @@ def get_books(
             search_terms = q.strip().split()
             for term in search_terms:
                 if term:
-                    search_pattern = f"%{term}%"
-                    query_str += """ AND (
-                        b.title ILIKE %s OR 
-                        b.author ILIKE %s OR 
-                        b.publisher ILIKE %s OR 
-                        b.isbn ILIKE %s OR 
-                        b.processes ILIKE %s OR
-                        EXISTS (
-                            SELECT 1 FROM reviews r 
-                            WHERE r.book_id = b.id AND r.review_text ILIKE %s
-                        )
-                    )"""
-                    params.extend([search_pattern] * 6)
+                    term_lower = term.lower()
+                    
+                    # Prefix word boundary matching for short terms (length <= 3) in reviews
+                    # to prevent false positives like "tom" in "suhteettoman" or "ken" in "kesken"
+                    if len(term) <= 3 and term.isalnum():
+                        review_cond = "EXISTS (SELECT 1 FROM reviews r WHERE r.book_id = b.id AND r.review_text ~* %s)"
+                        review_pat = f"\\y{term}"
+                    else:
+                        review_cond = "EXISTS (SELECT 1 FROM reviews r WHERE r.book_id = b.id AND r.review_text ILIKE %s)"
+                        review_pat = f"%{term}%"
+                    
+                    if term_lower == "tom":
+                        # Support mapping "tom" to "thomas" in author name search
+                        query_str += f""" AND (
+                            b.title ILIKE %s OR 
+                            b.author ILIKE %s OR 
+                            b.author ILIKE %s OR
+                            b.publisher ILIKE %s OR 
+                            b.isbn ILIKE %s OR 
+                            b.processes ILIKE %s OR
+                            {review_cond}
+                        )"""
+                        params.extend([f"%{term}%", f"%{term}%", "%thomas%", f"%{term}%", f"%{term}%", f"%{term}%", review_pat])
+                    else:
+                        query_str += f""" AND (
+                            b.title ILIKE %s OR 
+                            b.author ILIKE %s OR 
+                            b.publisher ILIKE %s OR 
+                            b.isbn ILIKE %s OR 
+                            b.processes ILIKE %s OR
+                            {review_cond}
+                        )"""
+                        params.extend([f"%{term}%", f"%{term}%", f"%{term}%", f"%{term}%", f"%{term}%", review_pat])
+
 
 
 

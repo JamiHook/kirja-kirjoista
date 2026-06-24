@@ -1828,6 +1828,13 @@
         function selectCategory(catId) {
             selectedCategoryId = catId;
             
+            // Clear search query when selecting a category
+            currentSearchQuery = '';
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
             document.querySelectorAll('.category-item').forEach(btn => {
                 btn.classList.remove('active');
             });
