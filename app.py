@@ -7,7 +7,7 @@ import base64
 import hashlib
 import contextlib
 from fastapi import FastAPI, HTTPException, Query, Header, Depends
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -570,6 +570,13 @@ def get_index():
         with open(index_path, "r", encoding="utf-8") as f:
             return f.read()
     return HTMLResponse("<h1>index.html not found! Please check configuration.</h1>", status_code=404)
+
+@app.get("/johannes.jpg")
+def get_johannes_image():
+    image_path = os.path.join(os.path.dirname(__file__), "johannes.jpg")
+    if os.path.exists(image_path):
+        return FileResponse(image_path)
+    raise HTTPException(status_code=404, detail="Image not found")
 
 if __name__ == "__main__":
     import uvicorn

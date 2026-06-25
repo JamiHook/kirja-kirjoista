@@ -23,3 +23,5 @@ kolahdusten_scan_output_pre_pre_advanced.txt
 kolahdusten_scan_output_pre_pre_debug.txt
 kolahdusten_scan_output_pre_pre_final.txt
 kolahdusten_scan_output_pre_pre_pre.txt
+*.docx
+~$*
